@@ -24,14 +24,13 @@ def main():
 
     rail = []
     for t in doc["terminals"]:
+        # NO NAMES. The rail in a public repository carries topology only; the
+        # labels go into the card's config in the dashboard, which lives in Home
+        # Assistant. names.json is written beside this and is NOT committed.
         cells = []
         for c in t["cells"]:
-            if t["kind"] == "num":
-                cells.append([c["no"], c["sig"], c["entity"], c["name"]])
-            elif t["kind"] == "dali":
-                cells.append([c["no"], c["sig"], c["idx"], c["name"]])
-            else:
-                cells.append([c["no"], c["sig"], c["idx"], c["name"]])
+            ref = c["entity"] if t["kind"] == "num" else c["idx"]
+            cells.append([c["no"], c["sig"], ref])
         rail.append([t["pos"], t["model"], t["kind"], cells])
 
     src = open(os.path.join(HERE, "src/card.js"), encoding="utf-8").read()
@@ -44,6 +43,12 @@ def main():
                                   "cells": cells}, separators=(",", ":")))
     os.makedirs(os.path.dirname(CARD), exist_ok=True)
     open(CARD, "w", encoding="utf-8").write(out)
+
+    labels = {c["sig"]: c["name"]
+              for t in doc["terminals"] for c in t["cells"] if c.get("name")}
+    json.dump(labels, open(os.path.join(HERE, "names.json"), "w"),
+              ensure_ascii=False, indent=1)
+    print(f"names.json: {len(labels)} labels (gitignored -- this is the floor plan)")
     print(f"{CARD}: {len(out)} bytes, {len(rail)} terminals, {cells} cells")
 
 

@@ -9,6 +9,13 @@
  * could be drawn there but not used. Here a cell hovers, and clicking one opens
  * Home Assistant's own more-info dialog, with history, for that exact channel.
  *
+ * NO NAMES LIVE IN THIS FILE. The rail carries hardware topology only --
+ * terminal models and channel counts. Which room a button lights, where a leak
+ * sensor sits and whose bedroom is whose is a floor plan, and this repository
+ * is public. A cell takes its label from Home Assistant's own friendly_name at
+ * runtime, or from an optional `names:` map in the card's config, which lives
+ * in the dashboard rather than here.
+ *
  * THE LAYOUT IS GENERATED, NOT TYPED. build.py reads the terminal list out of
  * Podlipa2026.1.tsproj, the index-to-channel binding out of MAIN's TcLinkTo
  * attributes, and the channel names out of GVL_DirectReactiveMap,
@@ -40,6 +47,9 @@ const DEFAULTS = {
             "sensor.electrical_current_l3"],
   frequency: "sensor.electrical_frequency",
   show_electricity: true,
+  // Optional { "DI-24-3": "a room name" }. Lives in the dashboard, not in
+  // this repository -- see the note at the top.
+  names: {},
 };
 
 const STYLES = `
@@ -144,6 +154,16 @@ class PodlipaPlcRailCard extends HTMLElement {
     return m ? `${p}${m[1]}_${m[2]}` : "";
   }
 
+  /** A cell's tooltip: the config's name, else Home Assistant's own, else the
+   *  signal on the terminal. Never anything baked into this file. */
+  _label(sig, id) {
+    const given = this._config.names && this._config.names[sig];
+    if (given) return `${sig}: ${given}`;
+    const s = this._st(id);
+    const fn = s && s.attributes && s.attributes.friendly_name;
+    return fn && fn !== sig ? `${sig}: ${fn}` : sig;
+  }
+
   _st(id) {
     return this._hass && id ? this._hass.states[id] : undefined;
   }
@@ -190,15 +210,15 @@ class PodlipaPlcRailCard extends HTMLElement {
       } else {
         const grid = document.createElement("div");
         grid.className = "cells" + (cells.length > 8 ? " wide" : "");
-        for (const [no, sig, idx, name] of cells) {
+        for (const [no, sig, idx] of cells) {
           const b = document.createElement("button");
           b.className = "cell " + kind;
           b.innerHTML = `<span class="no">${no}</span><span class="val">&middot;</span>`;
-          b.title = name ? `${sig}: ${name}` : sig;
           const id = this._entity(kind, sig, idx);
+          b.title = this._label(sig, id);
           b.addEventListener("click", () => this._moreInfo(id));
           grid.appendChild(b);
-          this._cells.push({ el: b, val: b.querySelector(".val"), kind, id });
+          this._cells.push({ el: b, val: b.querySelector(".val"), kind, id, sig });
         }
         box.appendChild(grid);
       }
@@ -219,6 +239,7 @@ class PodlipaPlcRailCard extends HTMLElement {
         c.val.textContent = c.kind === "num" ? "–" : "?";
         continue;
       }
+      c.el.title = this._label(c.sig, c.id);
       if (c.kind === "dali") {
         c.el.classList.add(s.state === "on" ? "on" : "off");
         c.val.textContent = s.state === "on"

@@ -67,8 +67,19 @@ this is worth deriving: it is the one terminal that breaks the
 eight-channels-per-row assumption, and a hand-drawn rail would have had it wrong
 and looked right.
 
-## Why this repository is private
+## Where the names are, and why they are not here
 
-The card carries 207 channel names -- which room each button lights, where each
-leak sensor sits, which bedroom is whose. That is a floor plan. Nothing here is
-a credential, but it is not a thing to publish either.
+The card carries hardware topology only: terminal models and channel counts.
+Which room a button lights, where a leak sensor sits and whose bedroom is whose
+is a floor plan, so it is not in this repository.
+
+A cell labels itself from, in order:
+
+1. the `names:` map in the card's own config -- which lives in the dashboard,
+   inside Home Assistant
+2. the entity's `friendly_name`, for the channels that have a named entity
+3. the signal on the terminal, `DI-24-3`
+
+`build.py` writes the map to `names.json` beside itself, which is gitignored.
+Paste it into the card config, or leave it out and take what Home Assistant
+already knows.
