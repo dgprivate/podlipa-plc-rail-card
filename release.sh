@@ -32,4 +32,4 @@ echo "released $VER"
 # so it has to run again now that the tag exists.
 python3 build.py >/dev/null
 gh release upload "$VER" dist/podlipa-plc-rail-card.js --clobber >/dev/null
-python3 ha_install.py
+"${PYTHON:-$HOME/projects/podlipa-plc/.venv/bin/python}" ha_install.py
