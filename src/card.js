@@ -71,7 +71,10 @@ const STYLES = `
   .term { display: flex; flex-direction: column; min-width: 84px; padding: 4px;
           border: 1px solid var(--divider-color); border-radius: 4px;
           background: var(--secondary-background-color); }
-  .term.passive { opacity: .5; }
+  /* The feeds and the end cap carry nothing, so they take the width of what
+     they are rather than the width of a terminal with eight channels on it. */
+  .term.passive { opacity: .5; min-width: 46px; }
+  .term.passive .strip { flex-direction: column; gap: 0; align-items: center; }
   .strip { display: flex; justify-content: space-between; align-items: center;
            margin-bottom: 4px; padding: 2px 4px; font-size: 11px;
            color: var(--secondary-text-color); }
@@ -79,7 +82,8 @@ const STYLES = `
   .strip .model { font-family: var(--code-font-family, monospace); }
   .cells { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
   .cells.wide { grid-template-columns: repeat(4, 1fr); }
-  .cells.empty { font-size: 11px; padding: 6px 4px; text-align: center;
+  .cells.empty { font-size: 10px; padding: 6px 2px; text-align: center;
+                 line-height: 1.25; word-break: break-word;
                  color: var(--secondary-text-color); }
   .cell { display: flex; flex-direction: column; align-items: center;
           justify-content: center; min-width: 32px; min-height: 32px;
@@ -205,7 +209,7 @@ class PodlipaPlcRailCard extends HTMLElement {
       if (!cells.length) {
         const e = document.createElement("div");
         e.className = "cells empty";
-        e.textContent = kind === "passive" ? "sistemski" : "ni vezan";
+        e.textContent = kind === "passive" ? "sys" : "ni vezan";
         box.appendChild(e);
       } else {
         const grid = document.createElement("div");
@@ -278,5 +282,5 @@ window.customCards.push({
 });
 
 console.info(
-  "%c PODLIPA-PLC-RAIL-CARD %c v1.0.0 ",
+  "%c PODLIPA-PLC-RAIL-CARD %c v1.0.2 ",
   "background:#0f7a3d;color:#fff", "background:#333;color:#fff");
