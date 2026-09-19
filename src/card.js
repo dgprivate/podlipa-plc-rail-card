@@ -30,6 +30,7 @@
  *   (every entity is found automatically; see README for the overrides)
  */
 
+const VERSION = "/*__VERSION__*/dev";
 const RAIL = /*__RAIL__*/[];
 const COUNTS = /*__COUNTS__*/{};
 
@@ -190,7 +191,8 @@ class PodlipaPlcRailCard extends HTMLElement {
         <div>
           <div class="title">${this._config.name}</div>
           <div class="sub">CX8290 EtherCAT chain &middot; ${COUNTS.terminals} terminalov
-            &middot; ${COUNTS.cells} kanalov</div>
+            &middot; ${COUNTS.cells} kanalov &middot; <span title="razlicica kartice"
+            >${VERSION}</span></div>
         </div>
       </div>
       <div class="elec" id="elec"></div>
@@ -282,5 +284,5 @@ window.customCards.push({
 });
 
 console.info(
-  "%c PODLIPA-PLC-RAIL-CARD %c v1.0.2 ",
+  `%c PODLIPA-PLC-RAIL-CARD %c ${VERSION} `,
   "background:#0f7a3d;color:#fff", "background:#333;color:#fff");

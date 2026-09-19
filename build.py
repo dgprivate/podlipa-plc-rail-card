@@ -33,7 +33,10 @@ def main():
             cells.append([c["no"], c["sig"], ref])
         rail.append([t["pos"], t["model"], t["kind"], cells])
 
+    version = (subprocess.run(["git", "describe", "--tags", "--always"], cwd=HERE,
+                              capture_output=True, text=True).stdout.strip() or "dev")
     src = open(os.path.join(HERE, "src/card.js"), encoding="utf-8").read()
+    src = src.replace("/*__VERSION__*/dev", version)
     payload = json.dumps(rail, ensure_ascii=False, separators=(",", ":"))
     out = src.replace("/*__RAIL__*/[]", payload)
     digital = doc["digital"]
