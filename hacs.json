@@ -1,0 +1,6 @@
+{
+  "name": "Podlipa PLC Rail",
+  "render_readme": true,
+  "filename": "podlipa-plc-rail-card.js",
+  "homeassistant": "2024.1.0"
+}
